@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum RolUsuario {
+  DUENO
+  OPERADOR
+}
+
+enum OrigenVenta {
+  MANUAL
+  VOZ
+}
+
+enum EstadoFactura {
+  EMITIDA
+  ANULADA
+}
+
+enum ResultadoComando {
+  EJECUTADO
+  RECHAZADO
+  PENDIENTE_CONFIRMACION
+}
+
+model Tienda {
+  id             String      @id @default(uuid()) @db.Char(36)
+  nombre         String      @db.VarChar(255)
+  activo         Boolean     @default(true)
+  fechaCreacion  DateTime    @default(now()) @map("fecha_creacion") @db.Timestamp()
+
+  usuarios       Usuario[]
+  productos      Producto[]
+  ventas         Venta[]
+  detallesVenta  DetalleVenta[]
+  facturas       Factura[]
+  comandosVoz    ComandoVoz[]
+
+  @@map("tienda")
+}
+
+model Usuario {
+  id             String      @id @default(uuid()) @db.Char(36)
+  tiendaId       String      @map("tienda_id") @db.Char(36)
+  nombre         String      @db.VarChar(255)
+  correo         String      @unique @db.VarChar(255)
+  passwordHash   String      @map("password_hash") @db.VarChar(255)
+  rol            RolUsuario
+  activo         Boolean     @default(true)
+  fechaCreacion  DateTime    @default(now()) @map("fecha_creacion") @db.Timestamp()
+
+  tienda         Tienda      @relation(fields: [tiendaId], references: [id])
+  ventas         Venta[]
+  comandosVoz    ComandoVoz[]
+
+  @@unique([id, tiendaId])
+  @@map("usuario")
+}
+
+model Producto {
+  id             String      @id @default(uuid()) @db.Char(36)
+  tiendaId       String      @map("tienda_id") @db.Char(36)
+  nombre         String      @db.VarChar(255)
+  precio         Decimal     @db.Decimal(10, 2)
+  stock          Int         @default(0)
+  categoria      String?     @db.VarChar(100)
+  activo         Boolean     @default(true)
+  fechaCreacion  DateTime    @default(now()) @map("fecha_creacion") @db.Timestamp()
+
+  tienda         Tienda      @relation(fields: [tiendaId], references: [id])
+  detallesVenta  DetalleVenta[]
+
+  @@unique([id, tiendaId])
+  @@map("producto")
+}
+
+model Venta {
+  id             String        @id @default(uuid()) @db.Char(36)
+  tiendaId       String        @map("tienda_id") @db.Char(36)
+  usuarioId      String        @map("usuario_id") @db.Char(36)
+  total          Decimal       @default(0) @db.Decimal(10, 2)
+  origen         OrigenVenta
+  anulada        Boolean       @default(false)
+  fecha          DateTime      @default(now()) @db.Timestamp()
+
+  tienda         Tienda        @relation(fields: [tiendaId], references: [id])
+  usuario        Usuario       @relation(fields: [usuarioId, tiendaId], references: [id, tiendaId])
+  detallesVenta  DetalleVenta[]
+  factura        Factura?
+
+  @@unique([id, tiendaId])
+  @@map("venta")
+}
+
+model DetalleVenta {
+  id               String   @id @default(uuid()) @db.Char(36)
+  tiendaId         String   @map("tienda_id") @db.Char(36)
+  ventaId          String   @map("venta_id") @db.Char(36)
+  productoId       String   @map("producto_id") @db.Char(36)
+  cantidad         Int
+  precioUnitario   Decimal  @map("precio_unitario") @db.Decimal(10, 2)
+  subtotal         Decimal  @db.Decimal(10, 2)
+
+  tienda           Tienda   @relation(fields: [tiendaId], references: [id])
+  venta            Venta    @relation(fields: [ventaId, tiendaId], references: [id, tiendaId])
+  producto         Producto @relation(fields: [productoId, tiendaId], references: [id, tiendaId])
+
+  @@index([ventaId])
+  @@map("detalle_venta")
+}
+
+model Factura {
+  id             String       @id @default(uuid()) @db.Char(36)
+  tiendaId       String       @map("tienda_id") @db.Char(36)
+  ventaId        String       @unique @map("venta_id") @db.Char(36)
+  folio          String       @unique @db.VarChar(50)
+  total          Decimal      @db.Decimal(10, 2)
+  estado         EstadoFactura @default(EMITIDA)
+  leyenda        String       @default("Documento simulado, sin validez fiscal") @db.VarChar(255)
+  fechaEmision   DateTime     @default(now()) @map("fecha_emision") @db.Timestamp()
+
+  tienda         Tienda       @relation(fields: [tiendaId], references: [id])
+  venta          Venta        @relation(fields: [ventaId, tiendaId], references: [id, tiendaId])
+
+  @@unique([id, tiendaId])
+  @@unique([ventaId, tiendaId])
+  @@map("factura")
+}
+
+model ComandoVoz {
+  id                 String            @id @default(uuid()) @db.Char(36)
+  tiendaId           String            @map("tienda_id") @db.Char(36)
+  usuarioId          String            @map("usuario_id") @db.Char(36)
+  textoTranscrito    String            @map("texto_transcrito") @db.Text()
+  intencionDetectada String?           @map("intencion_detectada") @db.VarChar(100)
+  entidadesExtraidas Json?             @map("entidades_extraidas")
+  resultado          ResultadoComando
+  fecha              DateTime          @default(now()) @db.Timestamp()
+
+  tienda             Tienda            @relation(fields: [tiendaId], references: [id])
+  usuario            Usuario           @relation(fields: [usuarioId, tiendaId], references: [id, tiendaId])
+
+  @@map("comando_voz")
+}

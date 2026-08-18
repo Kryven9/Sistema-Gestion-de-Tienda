@@ -42,9 +42,13 @@ export function useOperadores() {
 
   const crearMutation = useMutation({
     mutationFn: crearOperador,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['operadores'] });
+    onSuccess: async (operadorCreado) => {
+      queryClient.setQueryData<Operador[]>(['operadores'], (actuales = []) => {
+        if (actuales.some((operador) => operador.id === operadorCreado.id)) return actuales;
+        return [operadorCreado, ...actuales];
+      });
       limpiarFormulario();
+      await queryClient.invalidateQueries({ queryKey: ['operadores'], refetchType: 'active' });
     },
     onError: (err: unknown) => {
       setError(extraerError(err));
@@ -63,10 +67,23 @@ export function useOperadores() {
   });
 
   const toggleEstadoMutation = useMutation({
-    mutationFn: (operador: Operador) =>
-      operador.activo ? desactivarOperador(operador.id) : activarOperador(operador.id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['operadores'] });
+    mutationFn: async (operador: Operador) => {
+      if (operador.activo) {
+        await desactivarOperador(operador.id);
+      } else {
+        await activarOperador(operador.id);
+      }
+      return operador;
+    },
+    onSuccess: (operadorActualizado) => {
+      queryClient.setQueryData<Operador[]>(['operadores'], (actuales = []) =>
+        actuales.map((operador) =>
+          operador.id === operadorActualizado.id
+            ? { ...operador, activo: !operadorActualizado.activo }
+            : operador,
+        ),
+      );
+      queryClient.invalidateQueries({ queryKey: ['operadores'], refetchType: 'active' });
     },
   });
 
@@ -116,6 +133,7 @@ export function useOperadores() {
     handleSubmit,
     iniciarEdicion,
     abrirFormularioCrear,
+    cerrarFormulario: limpiarFormulario,
     toggleEstado: toggleEstadoMutation.mutate,
   };
 }

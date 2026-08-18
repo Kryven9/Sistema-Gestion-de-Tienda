@@ -1,58 +1,78 @@
+import { LockKeyhole, Mail, Store } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Alert } from '../components/Alert';
+import { Button } from '../components/Button';
+import { FormField } from '../components/FormField';
 import { useLogin } from '../hooks/useLogin';
 
 export function LoginPage() {
   const { correo, setCorreo, password, setPassword, error, cargando, handleSubmit } = useLogin();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-900 px-4">
-      <div className="w-full max-w-md rounded-lg bg-gray-800 p-8 shadow-lg">
-        <h1 className="mb-6 text-center text-2xl font-bold text-white">Iniciar Sesión</h1>
+    <div className="grid min-h-screen bg-slate-50 lg:grid-cols-2">
+      <div className="hidden bg-slate-900 p-12 text-white lg:flex lg:flex-col lg:justify-between">
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-slate-900">
+            <Store size={22} />
+          </span>
+          <span className="text-lg font-semibold">Gestión de Tienda</span>
+        </div>
+        <div className="max-w-lg">
+          <p className="text-4xl font-semibold leading-tight tracking-tight">
+            Administra tu negocio de forma simple y eficiente.
+          </p>
+          <p className="mt-5 text-slate-400">
+            Todo lo que necesitas, en un espacio claro y organizado.
+          </p>
+        </div>
+        <p className="text-sm text-slate-500">Panel de gestión seguro</p>
+      </div>
 
-        {error && (
-          <div className="mb-4 rounded bg-red-600/20 p-3 text-sm text-red-400">{error}</div>
-        )}
+      <div className="flex items-center justify-center p-6 sm:p-10">
+        <div className="w-full max-w-md">
+          <div className="mb-8 lg:hidden">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white">
+              <Store size={22} />
+            </span>
+          </div>
+          <p className="text-sm font-medium text-slate-500">Bienvenido de nuevo</p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">Inicia sesión</h1>
+          <p className="mt-2 text-sm text-slate-500">Ingresa tus credenciales para continuar.</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm text-gray-300">Correo electrónico</label>
-            <input
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+            {error && <Alert>{error}</Alert>}
+            <FormField
+              id="correo"
               type="email"
+              label="Correo electrónico"
               value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
-              required
-              className="w-full rounded bg-gray-700 px-3 py-2 text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(event) => setCorreo(event.target.value)}
               placeholder="correo@ejemplo.com"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm text-gray-300">Contraseña</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              icon={<Mail size={17} />}
               required
-              className="w-full rounded bg-gray-700 px-3 py-2 text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="••••••"
             />
-          </div>
+            <FormField
+              id="password"
+              type="password"
+              label="Contraseña"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Tu contraseña"
+              icon={<LockKeyhole size={17} />}
+              required
+            />
+            <Button type="submit" className="w-full" loading={cargando}>
+              Ingresar
+            </Button>
+          </form>
 
-          <button
-            type="submit"
-            disabled={cargando}
-            className="w-full rounded bg-blue-600 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-          >
-            {cargando ? 'Ingresando...' : 'Ingresar'}
-          </button>
-        </form>
-
-        <p className="mt-4 text-center text-sm text-gray-400">
-          ¿No tienes cuenta?{' '}
-          <Link to="/registro" className="text-blue-400 hover:underline">
-            Regístrate
-          </Link>
-        </p>
+          <p className="mt-6 text-center text-sm text-slate-500">
+            ¿No tienes cuenta?{' '}
+            <Link to="/registro" className="font-semibold text-slate-900 hover:underline">
+              Regístrate
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

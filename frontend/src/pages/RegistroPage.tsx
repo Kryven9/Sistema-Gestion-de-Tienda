@@ -1,4 +1,8 @@
+import { LockKeyhole, Mail, Store, UserRound } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Alert } from '../components/Alert';
+import { Button } from '../components/Button';
+import { FormField } from '../components/FormField';
 import { useRegistro } from '../hooks/useRegistro';
 
 export function RegistroPage() {
@@ -17,76 +21,68 @@ export function RegistroPage() {
   } = useRegistro();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-900 px-4">
-      <div className="w-full max-w-md rounded-lg bg-gray-800 p-8 shadow-lg">
-        <h1 className="mb-6 text-center text-2xl font-bold text-white">Crear Cuenta</h1>
+    <div className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6">
+      <div className="mx-auto w-full max-w-lg">
+        <div className="mb-8 text-center">
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-sm">
+            <Store size={23} />
+          </span>
+          <h1 className="mt-5 text-3xl font-bold tracking-tight text-slate-900">Crea tu cuenta</h1>
+          <p className="mt-2 text-sm text-slate-500">Configura tu tienda en unos pocos pasos.</p>
+        </div>
 
-        {error && (
-          <div className="mb-4 rounded bg-red-600/20 p-3 text-sm text-red-400">{error}</div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm text-gray-300">Nombre de la tienda</label>
-            <input
-              type="text"
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && <Alert>{error}</Alert>}
+            <FormField
+              id="tienda"
+              label="Nombre de la tienda"
               value={nombreTienda}
-              onChange={(e) => setNombreTienda(e.target.value)}
+              onChange={(event) => setNombreTienda(event.target.value)}
+              placeholder="Mi tienda"
+              icon={<Store size={17} />}
               required
-              className="w-full rounded bg-gray-700 px-3 py-2 text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Mi Tienda"
             />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm text-gray-300">Tu nombre</label>
-            <input
-              type="text"
+            <FormField
+              id="nombre"
+              label="Tu nombre"
               value={nombreUsuario}
-              onChange={(e) => setNombreUsuario(e.target.value)}
+              onChange={(event) => setNombreUsuario(event.target.value)}
+              placeholder="Nombre completo"
+              icon={<UserRound size={17} />}
               required
-              className="w-full rounded bg-gray-700 px-3 py-2 text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Luis Sebastian"
             />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm text-gray-300">Correo electrónico</label>
-            <input
+            <FormField
+              id="correo"
               type="email"
+              label="Correo electrónico"
               value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
-              required
-              className="w-full rounded bg-gray-700 px-3 py-2 text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(event) => setCorreo(event.target.value)}
               placeholder="correo@ejemplo.com"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm text-gray-300">Contraseña</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              icon={<Mail size={17} />}
               required
-              minLength={6}
-              className="w-full rounded bg-gray-700 px-3 py-2 text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Mínimo 6 caracteres"
             />
-          </div>
+            <FormField
+              id="password"
+              type="password"
+              label="Contraseña"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Mínimo 6 caracteres"
+              icon={<LockKeyhole size={17} />}
+              hint="Usa al menos 6 caracteres."
+              minLength={6}
+              required
+            />
+            <Button type="submit" className="w-full" loading={cargando}>
+              Crear cuenta
+            </Button>
+          </form>
+        </div>
 
-          <button
-            type="submit"
-            disabled={cargando}
-            className="w-full rounded bg-blue-600 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-          >
-            {cargando ? 'Creando cuenta...' : 'Crear Cuenta'}
-          </button>
-        </form>
-
-        <p className="mt-4 text-center text-sm text-gray-400">
+        <p className="mt-6 text-center text-sm text-slate-500">
           ¿Ya tienes cuenta?{' '}
-          <Link to="/login" className="text-blue-400 hover:underline">
+          <Link to="/login" className="font-semibold text-slate-900 hover:underline">
             Inicia sesión
           </Link>
         </p>

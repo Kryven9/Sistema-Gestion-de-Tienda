@@ -17,10 +17,7 @@ export class CambiarPasswordUseCase {
   ) {}
 
   async ejecutar(comando: CambiarPasswordComando): Promise<void> {
-    const usuario = await this.repositorioUsuarios.buscarPorId(
-      comando.usuarioId,
-      comando.tiendaId,
-    );
+    const usuario = await this.repositorioUsuarios.buscarPorId(comando.usuarioId, comando.tiendaId);
 
     if (!usuario) {
       throw new EntidadNoEncontradaError('Usuario', comando.usuarioId);

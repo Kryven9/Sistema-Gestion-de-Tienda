@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from './infrastructure/persistence/prisma/prisma';
 import { PrismaTiendaRepository } from './infrastructure/persistence/prisma/PrismaTiendaRepository';
 import { PrismaUsuarioRepository } from './infrastructure/persistence/prisma/PrismaUsuarioRepository';
 import { BcryptPasswordHasher } from './infrastructure/services/BcryptPasswordHasher';
@@ -20,9 +20,6 @@ import { UsuariosController } from './infrastructure/http/controllers/UsuariosCo
 import { crearRutasAuth } from './infrastructure/http/routes/authRoutes';
 import { crearRutasUsuarios } from './infrastructure/http/routes/usuariosRoutes';
 import { errorHandler } from './infrastructure/http/middlewares/errorHandler';
-
-// Inicializar Prisma
-const prisma = new PrismaClient();
 
 // Inicializar adaptadores de infraestructura
 const repositorioTiendas = new PrismaTiendaRepository(prisma);

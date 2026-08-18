@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { registrar } from '../api/auth';
-import { useAuth } from '../contexts/AuthContext';
+import { registrar, login } from '../api/auth';
+import { useAuthStore } from '../stores/useAuthStore';
 
 export function RegistroPage() {
   const [nombreTienda, setNombreTienda] = useState('');
@@ -10,7 +10,7 @@ export function RegistroPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
-  const { iniciarSesion } = useAuth();
+  const iniciarSesion = useAuthStore((s) => s.iniciarSesion);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,8 +20,6 @@ export function RegistroPage() {
 
     try {
       await registrar({ nombreTienda, nombreUsuario, correo, password });
-      // Auto-login después del registro
-      const { login } = await import('../api/auth');
       const loginResultado = await login(correo, password);
       iniciarSesion(loginResultado.token, loginResultado.usuario);
       navigate('/');
@@ -67,7 +65,7 @@ export function RegistroPage() {
               onChange={(e) => setNombreUsuario(e.target.value)}
               required
               className="w-full rounded bg-gray-700 px-3 py-2 text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Juan Pérez"
+              placeholder="Luis Sebastian"
             />
           </div>
 

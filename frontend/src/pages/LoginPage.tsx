@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../api/auth';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthStore } from '../stores/useAuthStore';
 
 export function LoginPage() {
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
-  const { iniciarSesion } = useAuth();
+  const iniciarSesion = useAuthStore((s) => s.iniciarSesion);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {

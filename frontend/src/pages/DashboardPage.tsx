@@ -1,8 +1,9 @@
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthStore } from '../stores/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 
 export function DashboardPage() {
-  const { usuario, cerrarSesion } = useAuth();
+  const usuario = useAuthStore((s) => s.usuario);
+  const cerrarSesion = useAuthStore((s) => s.cerrarSesion);
   const navigate = useNavigate();
 
   const handleLogout = () => {

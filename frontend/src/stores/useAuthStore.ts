@@ -17,9 +17,15 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       estaAutenticado: false,
 
-      iniciarSesion: (token, usuario) => set({ token, usuario, estaAutenticado: true }),
+      iniciarSesion: (token, usuario) => {
+        localStorage.setItem('token', token);
+        set({ token, usuario, estaAutenticado: true });
+      },
 
-      cerrarSesion: () => set({ token: null, usuario: null, estaAutenticado: false }),
+      cerrarSesion: () => {
+        localStorage.removeItem('token');
+        set({ token: null, usuario: null, estaAutenticado: false });
+      },
     }),
     {
       name: 'auth-storage',

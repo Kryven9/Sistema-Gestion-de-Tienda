@@ -11,5 +11,6 @@ export interface UsuarioRepository {
     datos: Partial<Pick<Usuario, 'nombre'>>,
   ): Promise<Usuario>;
   actualizarPassword(id: string, tiendaId: string, passwordHash: string): Promise<void>;
+  activar(id: string, tiendaId: string): Promise<void>;
   desactivar(id: string, tiendaId: string): Promise<void>;
 }

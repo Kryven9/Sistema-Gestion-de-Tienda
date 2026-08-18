@@ -17,9 +17,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     navigate('/login');
   };
 
-  const itemsVisibles = navItems.filter(
-    (item) => !item.soloDueno || usuario?.rol === 'DUENO',
-  );
+  const itemsVisibles = navItems.filter((item) => !item.soloDueno || usuario?.rol === 'DUENO');
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">

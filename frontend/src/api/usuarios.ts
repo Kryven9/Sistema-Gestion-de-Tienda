@@ -24,10 +24,7 @@ export async function crearOperador(datos: {
   return data;
 }
 
-export async function editarOperador(
-  id: string,
-  datos: { nombre: string },
-): Promise<Operador> {
+export async function editarOperador(id: string, datos: { nombre: string }): Promise<Operador> {
   const { data } = await api.put<Operador>(`/usuarios/${id}`, datos);
   return data;
 }

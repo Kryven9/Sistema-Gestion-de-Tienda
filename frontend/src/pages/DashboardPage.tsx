@@ -7,8 +7,8 @@ export function DashboardPage() {
     <div>
       <h2 className="mb-4 text-2xl font-semibold">Dashboard</h2>
       <p className="text-gray-400">
-        Bienvenido, <span className="text-white font-medium">{usuario?.nombre}</span>. Has
-        iniciado sesión como <span className="text-blue-400">{usuario?.rol}</span>.
+        Bienvenido, <span className="text-white font-medium">{usuario?.nombre}</span>. Has iniciado
+        sesión como <span className="text-blue-400">{usuario?.rol}</span>.
       </p>
     </div>
   );

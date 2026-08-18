@@ -2,15 +2,7 @@ import { Link } from 'react-router-dom';
 import { useLogin } from '../hooks/useLogin';
 
 export function LoginPage() {
-  const {
-    correo,
-    setCorreo,
-    password,
-    setPassword,
-    error,
-    cargando,
-    handleSubmit,
-  } = useLogin();
+  const { correo, setCorreo, password, setPassword, error, cargando, handleSubmit } = useLogin();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-900 px-4">

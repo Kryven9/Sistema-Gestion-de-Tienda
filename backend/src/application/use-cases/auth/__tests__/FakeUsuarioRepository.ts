@@ -60,4 +60,14 @@ export class FakeUsuarioRepository implements UsuarioRepository {
     }
     throw new Error('Usuario no encontrado');
   }
+
+  async activar(id: string, tiendaId: string): Promise<void> {
+    for (const u of this.usuarios.values()) {
+      if (u.id === id && u.tiendaId === tiendaId) {
+        u.activo = true;
+        return;
+      }
+    }
+    throw new Error('Usuario no encontrado');
+  }
 }

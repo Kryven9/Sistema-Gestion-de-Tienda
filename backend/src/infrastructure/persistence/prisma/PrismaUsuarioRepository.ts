@@ -119,4 +119,11 @@ export class PrismaUsuarioRepository implements UsuarioRepository {
       data: { activo: false },
     });
   }
+
+  async activar(id: string, tiendaId: string): Promise<void> {
+    await this.prisma.usuario.update({
+      where: { id_tiendaId: { id, tiendaId } },
+      data: { activo: true },
+    });
+  }
 }

@@ -17,8 +17,9 @@ export class FakeProductoRepository implements ProductoRepository {
   }
 
   async buscarPorNombre(tiendaId: string, nombre: string): Promise<Producto[]> {
+    const nombreLower = nombre.toLowerCase();
     return [...this.productos.values()].filter(
-      (p) => p.tiendaId === tiendaId && p.nombre.includes(nombre) && p.activo,
+      (p) => p.tiendaId === tiendaId && p.nombre.toLowerCase().includes(nombreLower) && p.activo,
     );
   }
 

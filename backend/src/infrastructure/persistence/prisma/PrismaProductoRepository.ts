@@ -56,7 +56,7 @@ export class PrismaProductoRepository implements ProductoRepository {
     const productos = await this.prisma.producto.findMany({
       where: {
         tiendaId,
-        nombre: { contains: nombre },
+        nombre: { contains: nombre, mode: 'insensitive' },
         activo: true,
       },
       orderBy: { nombre: 'asc' },

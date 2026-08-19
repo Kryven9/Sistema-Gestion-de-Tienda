@@ -5,6 +5,7 @@ import { RegistroPage } from './pages/RegistroPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { FacturasPage } from './pages/FacturasPage';
 import { ProductosPage } from './pages/ProductosPage';
+import { ReportesPage } from './pages/ReportesPage';
 import { UsuariosPage } from './pages/UsuariosPage';
 import { VentasPage } from './pages/VentasPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -65,6 +66,16 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <FacturasPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reportes"
+            element={
+              <ProtectedRoute rolesPermitidos={['DUENO']}>
+                <Layout>
+                  <ReportesPage />
                 </Layout>
               </ProtectedRoute>
             }

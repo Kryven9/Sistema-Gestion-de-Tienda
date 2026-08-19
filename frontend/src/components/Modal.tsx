@@ -8,9 +8,17 @@ interface ModalProps {
   description?: string;
   children: ReactNode;
   onClose: () => void;
+  contentClassName?: string;
 }
 
-export function Modal({ open, title, description, children, onClose }: ModalProps) {
+export function Modal({
+  open,
+  title,
+  description,
+  children,
+  onClose,
+  contentClassName = '',
+}: ModalProps) {
   useEffect(() => {
     if (!open) return;
 
@@ -40,7 +48,7 @@ export function Modal({ open, title, description, children, onClose }: ModalProp
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white shadow-2xl"
+        className="flex max-h-[90vh] w-full max-w-lg flex-col rounded-2xl border border-slate-200 bg-white shadow-2xl"
       >
         <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-6 py-5">
           <div>
@@ -53,7 +61,9 @@ export function Modal({ open, title, description, children, onClose }: ModalProp
             <X size={18} />
           </Button>
         </div>
-        <div className="p-6">{children}</div>
+        <div className={`min-h-0 flex-1 overflow-y-auto px-6 py-6 ${contentClassName}`}>
+          {children}
+        </div>
       </div>
     </div>
   );

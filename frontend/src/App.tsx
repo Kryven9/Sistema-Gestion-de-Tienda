@@ -5,6 +5,7 @@ import { RegistroPage } from './pages/RegistroPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ProductosPage } from './pages/ProductosPage';
 import { UsuariosPage } from './pages/UsuariosPage';
+import { VentasPage } from './pages/VentasPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
 
@@ -43,6 +44,16 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <ProductosPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ventas"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <VentasPage />
                 </Layout>
               </ProtectedRoute>
             }

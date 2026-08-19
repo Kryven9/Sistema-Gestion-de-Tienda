@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { LayoutDashboard, LogOut, Menu, Package, PanelLeftClose, Store, Users } from 'lucide-react';
+import {
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Package,
+  PanelLeftClose,
+  ShoppingBag,
+  Store,
+  Users,
+} from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
 import { Button } from './Button';
@@ -7,6 +16,7 @@ import { Button } from './Button';
 const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/productos', label: 'Productos', icon: Package },
+  { path: '/ventas', label: 'Ventas', icon: ShoppingBag },
   { path: '/usuarios', label: 'Usuarios', icon: Users, soloDueno: true },
 ];
 

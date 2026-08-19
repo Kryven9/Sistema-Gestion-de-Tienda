@@ -36,16 +36,20 @@ import { GenerarFacturaSimuladaUseCase } from './application/use-cases/facturaci
 import { ConsultarDetalleFacturaUseCase } from './application/use-cases/facturacion/ConsultarDetalleFacturaUseCase';
 import { ListarFacturasPorFechaUseCase } from './application/use-cases/facturacion/ListarFacturasPorFechaUseCase';
 import { ConsultarFacturaPorVentaUseCase } from './application/use-cases/facturacion/ConsultarFacturaPorVentaUseCase';
+import { GenerarReporteUseCase } from './application/use-cases/reportes/GenerarReporteUseCase';
+import { ListarProductosStockBajoUseCase } from './application/use-cases/reportes/ListarProductosStockBajoUseCase';
 import { AuthController } from './infrastructure/http/controllers/AuthController';
 import { UsuariosController } from './infrastructure/http/controllers/UsuariosController';
 import { ProductosController } from './infrastructure/http/controllers/ProductosController';
 import { VentasController } from './infrastructure/http/controllers/VentasController';
 import { FacturasController } from './infrastructure/http/controllers/FacturasController';
+import { ReportesController } from './infrastructure/http/controllers/ReportesController';
 import { crearRutasAuth } from './infrastructure/http/routes/authRoutes';
 import { crearRutasUsuarios } from './infrastructure/http/routes/usuariosRoutes';
 import { crearRutasProductos } from './infrastructure/http/routes/productosRoutes';
 import { crearRutasVentas } from './infrastructure/http/routes/ventasRoutes';
 import { crearRutasFacturas } from './infrastructure/http/routes/facturasRoutes';
+import { crearRutasReportes } from './infrastructure/http/routes/reportesRoutes';
 import { errorHandler } from './infrastructure/http/middlewares/errorHandler';
 
 // Inicializar adaptadores de infraestructura
@@ -100,6 +104,10 @@ const consultarDetalleFacturaUseCase = new ConsultarDetalleFacturaUseCase(reposi
 const listarFacturasPorFechaUseCase = new ListarFacturasPorFechaUseCase(repositorioFacturas);
 const consultarFacturaPorVentaUseCase = new ConsultarFacturaPorVentaUseCase(repositorioFacturas);
 
+// Casos de uso — Reportes
+const generarReporteUseCase = new GenerarReporteUseCase(repositorioVentas, repositorioProductos);
+const listarProductosStockBajoUseCase = new ListarProductosStockBajoUseCase(repositorioProductos);
+
 // Casos de uso — Ventas
 const registrarVentaUseCase = new RegistrarVentaUseCase(
   repositorioProductos,
@@ -151,6 +159,10 @@ const facturasController = new FacturasController(
   listarFacturasPorFechaUseCase,
   consultarFacturaPorVentaUseCase,
 );
+const reportesController = new ReportesController(
+  generarReporteUseCase,
+  listarProductosStockBajoUseCase,
+);
 
 // Crear aplicación Express
 const app = express();
@@ -170,6 +182,7 @@ app.use('/api/usuarios', crearRutasUsuarios(usuariosController));
 app.use('/api/productos', crearRutasProductos(productosController));
 app.use('/api/ventas', crearRutasVentas(ventasController));
 app.use('/api/facturas', crearRutasFacturas(facturasController));
+app.use('/api/reportes', crearRutasReportes(reportesController));
 
 // Manejador de errores global
 app.use(errorHandler);

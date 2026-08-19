@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {
+  BarChart3,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -19,6 +20,7 @@ const navItems = [
   { path: '/productos', label: 'Productos', icon: Package },
   { path: '/ventas', label: 'Ventas', icon: ShoppingBag },
   { path: '/facturas', label: 'Facturas', icon: ReceiptText },
+  { path: '/reportes', label: 'Reportes', icon: BarChart3, soloDueno: true },
   { path: '/usuarios', label: 'Usuarios', icon: Users, soloDueno: true },
 ];
 

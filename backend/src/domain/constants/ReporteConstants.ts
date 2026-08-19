@@ -1,0 +1,1 @@
+export const UMBRAL_STOCK_BAJO_POR_DEFECTO = 5;

@@ -5,6 +5,8 @@ import { prisma } from './infrastructure/persistence/prisma/prisma';
 import { PrismaTiendaRepository } from './infrastructure/persistence/prisma/PrismaTiendaRepository';
 import { PrismaUsuarioRepository } from './infrastructure/persistence/prisma/PrismaUsuarioRepository';
 import { PrismaProductoRepository } from './infrastructure/persistence/prisma/PrismaProductoRepository';
+import { PrismaVentaRepository } from './infrastructure/persistence/prisma/PrismaVentaRepository';
+import { PrismaFacturaRepository } from './infrastructure/persistence/prisma/PrismaFacturaRepository';
 import { BcryptPasswordHasher } from './infrastructure/services/BcryptPasswordHasher';
 import { JwtTokenService } from './infrastructure/services/JwtTokenService';
 import { UuidIdGenerator } from './infrastructure/services/UuidIdGenerator';
@@ -24,18 +26,27 @@ import { ListarProductosUseCase } from './application/use-cases/productos/Listar
 import { BuscarProductosUseCase } from './application/use-cases/productos/BuscarProductosUseCase';
 import { FiltrarPorCategoriaUseCase } from './application/use-cases/productos/FiltrarPorCategoriaUseCase';
 import { ConsultarStockUseCase } from './application/use-cases/productos/ConsultarStockUseCase';
+import { RegistrarVentaUseCase } from './application/use-cases/ventas/RegistrarVentaUseCase';
+import { ConsultarDetalleVentaUseCase } from './application/use-cases/ventas/ConsultarDetalleVentaUseCase';
+import { ListarVentasPorFechaUseCase } from './application/use-cases/ventas/ListarVentasPorFechaUseCase';
+import { ListarVentasDelDiaOperadorUseCase } from './application/use-cases/ventas/ListarVentasDelDiaOperadorUseCase';
+import { AnularVentaUseCase } from './application/use-cases/ventas/AnularVentaUseCase';
 import { AuthController } from './infrastructure/http/controllers/AuthController';
 import { UsuariosController } from './infrastructure/http/controllers/UsuariosController';
 import { ProductosController } from './infrastructure/http/controllers/ProductosController';
+import { VentasController } from './infrastructure/http/controllers/VentasController';
 import { crearRutasAuth } from './infrastructure/http/routes/authRoutes';
 import { crearRutasUsuarios } from './infrastructure/http/routes/usuariosRoutes';
 import { crearRutasProductos } from './infrastructure/http/routes/productosRoutes';
+import { crearRutasVentas } from './infrastructure/http/routes/ventasRoutes';
 import { errorHandler } from './infrastructure/http/middlewares/errorHandler';
 
 // Inicializar adaptadores de infraestructura
 const repositorioTiendas = new PrismaTiendaRepository(prisma);
 const repositorioUsuarios = new PrismaUsuarioRepository(prisma);
 const repositorioProductos = new PrismaProductoRepository(prisma);
+const repositorioVentas = new PrismaVentaRepository(prisma);
+const repositorioFacturas = new PrismaFacturaRepository(prisma);
 const hashContrasena = new BcryptPasswordHasher();
 const servicioToken = new JwtTokenService();
 const generadorId = new UuidIdGenerator();
@@ -71,6 +82,22 @@ const buscarProductosUseCase = new BuscarProductosUseCase(repositorioProductos);
 const filtrarPorCategoriaUseCase = new FiltrarPorCategoriaUseCase(repositorioProductos);
 const consultarStockUseCase = new ConsultarStockUseCase(repositorioProductos);
 
+// Casos de uso — Ventas
+const registrarVentaUseCase = new RegistrarVentaUseCase(
+  repositorioProductos,
+  repositorioVentas,
+  repositorioFacturas,
+  generadorId,
+);
+const consultarDetalleVentaUseCase = new ConsultarDetalleVentaUseCase(repositorioVentas);
+const listarVentasPorFechaUseCase = new ListarVentasPorFechaUseCase(repositorioVentas);
+const listarVentasDelDiaOperadorUseCase = new ListarVentasDelDiaOperadorUseCase(repositorioVentas);
+const anularVentaUseCase = new AnularVentaUseCase(
+  repositorioVentas,
+  repositorioProductos,
+  repositorioFacturas,
+);
+
 // Controladores
 const authController = new AuthController(
   registrarTiendaUseCase,
@@ -94,6 +121,13 @@ const productosController = new ProductosController(
   filtrarPorCategoriaUseCase,
   consultarStockUseCase,
 );
+const ventasController = new VentasController(
+  registrarVentaUseCase,
+  consultarDetalleVentaUseCase,
+  listarVentasPorFechaUseCase,
+  listarVentasDelDiaOperadorUseCase,
+  anularVentaUseCase,
+);
 
 // Crear aplicación Express
 const app = express();
@@ -111,6 +145,7 @@ app.get('/health', (_req, res) => {
 app.use('/api/auth', crearRutasAuth(authController));
 app.use('/api/usuarios', crearRutasUsuarios(usuariosController));
 app.use('/api/productos', crearRutasProductos(productosController));
+app.use('/api/ventas', crearRutasVentas(ventasController));
 
 // Manejador de errores global
 app.use(errorHandler);

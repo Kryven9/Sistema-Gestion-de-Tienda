@@ -4,6 +4,7 @@ import cors from 'cors';
 import { prisma } from './infrastructure/persistence/prisma/prisma';
 import { PrismaTiendaRepository } from './infrastructure/persistence/prisma/PrismaTiendaRepository';
 import { PrismaUsuarioRepository } from './infrastructure/persistence/prisma/PrismaUsuarioRepository';
+import { PrismaProductoRepository } from './infrastructure/persistence/prisma/PrismaProductoRepository';
 import { BcryptPasswordHasher } from './infrastructure/services/BcryptPasswordHasher';
 import { JwtTokenService } from './infrastructure/services/JwtTokenService';
 import { UuidIdGenerator } from './infrastructure/services/UuidIdGenerator';
@@ -15,15 +16,26 @@ import { EditarOperadorUseCase } from './application/use-cases/usuarios/EditarOp
 import { DesactivarOperadorUseCase } from './application/use-cases/usuarios/DesactivarOperadorUseCase';
 import { ActivarOperadorUseCase } from './application/use-cases/usuarios/ActivarOperadorUseCase';
 import { ListarOperadoresUseCase } from './application/use-cases/usuarios/ListarOperadoresUseCase';
+import { CrearProductoUseCase } from './application/use-cases/productos/CrearProductoUseCase';
+import { EditarProductoUseCase } from './application/use-cases/productos/EditarProductoUseCase';
+import { DesactivarProductoUseCase } from './application/use-cases/productos/DesactivarProductoUseCase';
+import { ActivarProductoUseCase } from './application/use-cases/productos/ActivarProductoUseCase';
+import { ListarProductosUseCase } from './application/use-cases/productos/ListarProductosUseCase';
+import { BuscarProductosUseCase } from './application/use-cases/productos/BuscarProductosUseCase';
+import { FiltrarPorCategoriaUseCase } from './application/use-cases/productos/FiltrarPorCategoriaUseCase';
+import { ConsultarStockUseCase } from './application/use-cases/productos/ConsultarStockUseCase';
 import { AuthController } from './infrastructure/http/controllers/AuthController';
 import { UsuariosController } from './infrastructure/http/controllers/UsuariosController';
+import { ProductosController } from './infrastructure/http/controllers/ProductosController';
 import { crearRutasAuth } from './infrastructure/http/routes/authRoutes';
 import { crearRutasUsuarios } from './infrastructure/http/routes/usuariosRoutes';
+import { crearRutasProductos } from './infrastructure/http/routes/productosRoutes';
 import { errorHandler } from './infrastructure/http/middlewares/errorHandler';
 
 // Inicializar adaptadores de infraestructura
 const repositorioTiendas = new PrismaTiendaRepository(prisma);
 const repositorioUsuarios = new PrismaUsuarioRepository(prisma);
+const repositorioProductos = new PrismaProductoRepository(prisma);
 const hashContrasena = new BcryptPasswordHasher();
 const servicioToken = new JwtTokenService();
 const generadorId = new UuidIdGenerator();
@@ -49,6 +61,16 @@ const desactivarOperadorUseCase = new DesactivarOperadorUseCase(repositorioUsuar
 const activarOperadorUseCase = new ActivarOperadorUseCase(repositorioUsuarios);
 const listarOperadoresUseCase = new ListarOperadoresUseCase(repositorioUsuarios);
 
+// Casos de uso — Productos
+const crearProductoUseCase = new CrearProductoUseCase(repositorioProductos, generadorId);
+const editarProductoUseCase = new EditarProductoUseCase(repositorioProductos);
+const desactivarProductoUseCase = new DesactivarProductoUseCase(repositorioProductos);
+const activarProductoUseCase = new ActivarProductoUseCase(repositorioProductos);
+const listarProductosUseCase = new ListarProductosUseCase(repositorioProductos);
+const buscarProductosUseCase = new BuscarProductosUseCase(repositorioProductos);
+const filtrarPorCategoriaUseCase = new FiltrarPorCategoriaUseCase(repositorioProductos);
+const consultarStockUseCase = new ConsultarStockUseCase(repositorioProductos);
+
 // Controladores
 const authController = new AuthController(
   registrarTiendaUseCase,
@@ -61,6 +83,16 @@ const usuariosController = new UsuariosController(
   desactivarOperadorUseCase,
   activarOperadorUseCase,
   listarOperadoresUseCase,
+);
+const productosController = new ProductosController(
+  crearProductoUseCase,
+  editarProductoUseCase,
+  desactivarProductoUseCase,
+  activarProductoUseCase,
+  listarProductosUseCase,
+  buscarProductosUseCase,
+  filtrarPorCategoriaUseCase,
+  consultarStockUseCase,
 );
 
 // Crear aplicación Express
@@ -78,6 +110,7 @@ app.get('/health', (_req, res) => {
 
 app.use('/api/auth', crearRutasAuth(authController));
 app.use('/api/usuarios', crearRutasUsuarios(usuariosController));
+app.use('/api/productos', crearRutasProductos(productosController));
 
 // Manejador de errores global
 app.use(errorHandler);

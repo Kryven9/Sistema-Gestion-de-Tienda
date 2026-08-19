@@ -14,9 +14,11 @@ export function FormField({
   icon,
   className = '',
   id,
+  type = 'text',
   ...props
 }: FormFieldProps) {
   const inputId = id || props.name;
+  const isNumber = type === 'number';
 
   return (
     <div>
@@ -31,7 +33,8 @@ export function FormField({
         )}
         <input
           id={inputId}
-          className={`h-11 w-full rounded-xl border bg-white px-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 ${icon ? 'pl-10' : ''} ${error ? 'border-red-300' : 'border-slate-200'} ${className}`}
+          type={type}
+          className={`h-11 w-full rounded-xl border bg-white px-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 ${icon ? 'pl-10' : ''} ${error ? 'border-red-300' : 'border-slate-200'} ${isNumber ? '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none' : ''} ${className}`}
           {...props}
         />
       </div>

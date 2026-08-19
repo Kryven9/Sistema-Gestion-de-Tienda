@@ -1,10 +1,20 @@
 import { Venta } from '../../../../domain/entities/Venta';
 import { DetalleVenta } from '../../../../domain/entities/DetalleVenta';
-import { VentaRepository } from '../../../../domain/ports/repositories/VentaRepository';
+import { ProductoVendido } from '../../../../domain/entities/Reporte';
+import {
+  LineaVendida,
+  VentaRepository,
+} from '../../../../domain/ports/repositories/VentaRepository';
+
+export interface LineaVendidaConNombre extends LineaVendida {
+  nombre: string;
+}
 
 export class FakeVentaRepository implements VentaRepository {
   private ventas: Map<string, Venta> = new Map();
   private detalles: Map<string, DetalleVenta[]> = new Map();
+  public lineasCargadas: LineaVendidaConNombre[] = [];
+  public masVendidos: ProductoVendido[] = [];
 
   async guardar(venta: Venta, detalles: DetalleVenta[]): Promise<Venta> {
     this.ventas.set(venta.id, { ...venta });
@@ -51,5 +61,37 @@ export class FakeVentaRepository implements VentaRepository {
     if (venta && venta.tiendaId === tiendaId) {
       venta.anulada = true;
     }
+  }
+
+  async listarLineasVendidasPorRango(
+    tiendaId: string,
+    desde: Date,
+    hasta: Date,
+  ): Promise<LineaVendida[]> {
+    return this.lineasCargadas
+      .filter(() => tiendaId && desde && hasta)
+      .map(({ productoId, nombre, cantidad, subtotal }) => ({
+        productoId,
+        nombre,
+        cantidad,
+        subtotal,
+      }));
+  }
+
+  async contarProductosMasVendidos(
+    tiendaId: string,
+    desde: Date,
+    hasta: Date,
+    limite: number,
+  ): Promise<ProductoVendido[]> {
+    return this.masVendidos.slice(0, limite);
+  }
+
+  agregarLinea(linea: LineaVendidaConNombre) {
+    this.lineasCargadas.push(linea);
+  }
+
+  agregarMasVendido(producto: ProductoVendido) {
+    this.masVendidos.push(producto);
   }
 }

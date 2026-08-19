@@ -1,7 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { Venta } from '../../../domain/entities/Venta';
 import { DetalleVenta } from '../../../domain/entities/DetalleVenta';
-import { VentaRepository } from '../../../domain/ports/repositories/VentaRepository';
+import { ProductoVendido } from '../../../domain/entities/Reporte';
+import { LineaVendida, VentaRepository } from '../../../domain/ports/repositories/VentaRepository';
 import { OrigenVenta } from '../../../domain/enums/OrigenVenta';
 
 export class PrismaVentaRepository implements VentaRepository {
@@ -122,5 +123,61 @@ export class PrismaVentaRepository implements VentaRepository {
       where: { id_tiendaId: { id, tiendaId } },
       data: { anulada: true },
     });
+  }
+
+  async listarLineasVendidasPorRango(
+    tiendaId: string,
+    desde: Date,
+    hasta: Date,
+  ): Promise<LineaVendida[]> {
+    const lineas = await this.prisma.detalleVenta.findMany({
+      where: {
+        tiendaId,
+        venta: { anulada: false, fecha: { gte: desde, lte: hasta } },
+      },
+      include: { venta: true },
+    });
+
+    return lineas.map((detalle) => ({
+      productoId: detalle.productoId,
+      nombre: '',
+      cantidad: detalle.cantidad,
+      subtotal: Number(detalle.subtotal),
+    }));
+  }
+
+  async contarProductosMasVendidos(
+    tiendaId: string,
+    desde: Date,
+    hasta: Date,
+    limite: number,
+  ): Promise<ProductoVendido[]> {
+    const agrupado = await this.prisma.detalleVenta.groupBy({
+      by: ['productoId'],
+      where: {
+        tiendaId,
+        venta: { anulada: false, fecha: { gte: desde, lte: hasta } },
+      },
+      _sum: { cantidad: true, subtotal: true },
+      orderBy: { _sum: { cantidad: 'desc' } },
+      take: Math.max(1, limite),
+    });
+
+    if (agrupado.length === 0) return [];
+
+    const productos = await this.prisma.producto.findMany({
+      where: {
+        tiendaId,
+        id: { in: agrupado.map((item) => item.productoId) },
+      },
+    });
+    const nombres = new Map(productos.map((producto) => [producto.id, producto.nombre]));
+
+    return agrupado.map((item) => ({
+      productoId: item.productoId,
+      nombre: nombres.get(item.productoId) ?? `Producto ${item.productoId.slice(0, 6)}`,
+      cantidadVendida: item._sum.cantidad ?? 0,
+      totalGenerado: Number(item._sum.subtotal ?? 0),
+    }));
   }
 }

@@ -4,6 +4,8 @@ import { FakeProductoRepository } from '../../productos/__tests__/FakeProductoRe
 import { FakeVentaRepository } from './FakeVentaRepository';
 import { FakeFacturaRepository } from './FakeFacturaRepository';
 import { FakeIdGenerator } from '../../auth/__tests__/FakeIdGenerator';
+import { GeneradorFolio } from '../../../../domain/services/GeneradorFolio';
+import { GenerarFacturaSimuladaUseCase } from '../../facturacion/GenerarFacturaSimuladaUseCase';
 import { StockInsuficienteError } from '../../../../domain/errors/StockInsuficienteError';
 import { EntidadNoEncontradaError } from '../../../../domain/errors/EntidadNoEncontradaError';
 
@@ -19,10 +21,16 @@ describe('RegistrarVentaUseCase', () => {
     repositorioVentas = new FakeVentaRepository();
     repositorioFacturas = new FakeFacturaRepository();
     generadorId = new FakeIdGenerator();
+    const generadorFolio = new GeneradorFolio(generadorId);
+    const generarFactura = new GenerarFacturaSimuladaUseCase(
+      repositorioFacturas,
+      generadorFolio,
+      generadorId,
+    );
     casoUso = new RegistrarVentaUseCase(
       repositorioProductos,
       repositorioVentas,
-      repositorioFacturas,
+      generarFactura,
       generadorId,
     );
 
@@ -97,6 +105,8 @@ describe('RegistrarVentaUseCase', () => {
     expect(factura).not.toBeNull();
     expect(factura?.total).toBe(35);
     expect(factura?.leyenda).toBe('Documento simulado, sin validez fiscal');
+    expect(factura?.folio).toMatch(/^F-\d{8}-[A-Z0-9]{1,8}$/);
+    expect(factura?.estado).toBe('EMITIDA');
   });
 
   it('debería rechazar stock insuficiente', async () => {

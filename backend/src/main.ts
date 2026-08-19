@@ -10,6 +10,7 @@ import { PrismaFacturaRepository } from './infrastructure/persistence/prisma/Pri
 import { BcryptPasswordHasher } from './infrastructure/services/BcryptPasswordHasher';
 import { JwtTokenService } from './infrastructure/services/JwtTokenService';
 import { UuidIdGenerator } from './infrastructure/services/UuidIdGenerator';
+import { GeneradorFolio } from './domain/services/GeneradorFolio';
 import { RegistrarTiendaUseCase } from './application/use-cases/auth/RegistrarTiendaUseCase';
 import { LoginUseCase } from './application/use-cases/auth/LoginUseCase';
 import { CambiarPasswordUseCase } from './application/use-cases/auth/CambiarPasswordUseCase';
@@ -31,14 +32,20 @@ import { ConsultarDetalleVentaUseCase } from './application/use-cases/ventas/Con
 import { ListarVentasPorFechaUseCase } from './application/use-cases/ventas/ListarVentasPorFechaUseCase';
 import { ListarVentasDelDiaOperadorUseCase } from './application/use-cases/ventas/ListarVentasDelDiaOperadorUseCase';
 import { AnularVentaUseCase } from './application/use-cases/ventas/AnularVentaUseCase';
+import { GenerarFacturaSimuladaUseCase } from './application/use-cases/facturacion/GenerarFacturaSimuladaUseCase';
+import { ConsultarDetalleFacturaUseCase } from './application/use-cases/facturacion/ConsultarDetalleFacturaUseCase';
+import { ListarFacturasPorFechaUseCase } from './application/use-cases/facturacion/ListarFacturasPorFechaUseCase';
+import { ConsultarFacturaPorVentaUseCase } from './application/use-cases/facturacion/ConsultarFacturaPorVentaUseCase';
 import { AuthController } from './infrastructure/http/controllers/AuthController';
 import { UsuariosController } from './infrastructure/http/controllers/UsuariosController';
 import { ProductosController } from './infrastructure/http/controllers/ProductosController';
 import { VentasController } from './infrastructure/http/controllers/VentasController';
+import { FacturasController } from './infrastructure/http/controllers/FacturasController';
 import { crearRutasAuth } from './infrastructure/http/routes/authRoutes';
 import { crearRutasUsuarios } from './infrastructure/http/routes/usuariosRoutes';
 import { crearRutasProductos } from './infrastructure/http/routes/productosRoutes';
 import { crearRutasVentas } from './infrastructure/http/routes/ventasRoutes';
+import { crearRutasFacturas } from './infrastructure/http/routes/facturasRoutes';
 import { errorHandler } from './infrastructure/http/middlewares/errorHandler';
 
 // Inicializar adaptadores de infraestructura
@@ -50,6 +57,7 @@ const repositorioFacturas = new PrismaFacturaRepository(prisma);
 const hashContrasena = new BcryptPasswordHasher();
 const servicioToken = new JwtTokenService();
 const generadorId = new UuidIdGenerator();
+const generadorFolio = new GeneradorFolio(generadorId);
 
 // Casos de uso — Auth
 const registrarTiendaUseCase = new RegistrarTiendaUseCase(
@@ -82,11 +90,21 @@ const buscarProductosUseCase = new BuscarProductosUseCase(repositorioProductos);
 const filtrarPorCategoriaUseCase = new FiltrarPorCategoriaUseCase(repositorioProductos);
 const consultarStockUseCase = new ConsultarStockUseCase(repositorioProductos);
 
+// Casos de uso — Facturación
+const generarFacturaSimuladaUseCase = new GenerarFacturaSimuladaUseCase(
+  repositorioFacturas,
+  generadorFolio,
+  generadorId,
+);
+const consultarDetalleFacturaUseCase = new ConsultarDetalleFacturaUseCase(repositorioFacturas);
+const listarFacturasPorFechaUseCase = new ListarFacturasPorFechaUseCase(repositorioFacturas);
+const consultarFacturaPorVentaUseCase = new ConsultarFacturaPorVentaUseCase(repositorioFacturas);
+
 // Casos de uso — Ventas
 const registrarVentaUseCase = new RegistrarVentaUseCase(
   repositorioProductos,
   repositorioVentas,
-  repositorioFacturas,
+  generarFacturaSimuladaUseCase,
   generadorId,
 );
 const consultarDetalleVentaUseCase = new ConsultarDetalleVentaUseCase(repositorioVentas);
@@ -128,6 +146,11 @@ const ventasController = new VentasController(
   listarVentasDelDiaOperadorUseCase,
   anularVentaUseCase,
 );
+const facturasController = new FacturasController(
+  consultarDetalleFacturaUseCase,
+  listarFacturasPorFechaUseCase,
+  consultarFacturaPorVentaUseCase,
+);
 
 // Crear aplicación Express
 const app = express();
@@ -146,6 +169,7 @@ app.use('/api/auth', crearRutasAuth(authController));
 app.use('/api/usuarios', crearRutasUsuarios(usuariosController));
 app.use('/api/productos', crearRutasProductos(productosController));
 app.use('/api/ventas', crearRutasVentas(ventasController));
+app.use('/api/facturas', crearRutasFacturas(facturasController));
 
 // Manejador de errores global
 app.use(errorHandler);

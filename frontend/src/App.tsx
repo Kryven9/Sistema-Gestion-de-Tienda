@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LoginPage } from './pages/LoginPage';
 import { RegistroPage } from './pages/RegistroPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { ProductosPage } from './pages/ProductosPage';
 import { UsuariosPage } from './pages/UsuariosPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
@@ -32,6 +33,16 @@ function App() {
               <ProtectedRoute rolesPermitidos={['DUENO']}>
                 <Layout>
                   <UsuariosPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/productos"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ProductosPage />
                 </Layout>
               </ProtectedRoute>
             }

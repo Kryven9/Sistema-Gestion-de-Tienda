@@ -2,6 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction): void {
+  if (err.name === 'ZodError') {
+    res.status(400).json({ error: 'Datos inválidos', detalles: err.message });
+    return;
+  }
+
   if (err.name === 'CredencialesInvalidasError') {
     res.status(401).json({ error: err.message });
     return;
@@ -19,6 +24,11 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
 
   if (err.name === 'NoAutorizadoError') {
     res.status(403).json({ error: err.message });
+    return;
+  }
+
+  if (err.name === 'ValorInvalidoError') {
+    res.status(400).json({ error: err.message });
     return;
   }
 

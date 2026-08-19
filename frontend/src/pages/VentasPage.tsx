@@ -38,15 +38,15 @@ function formatearMoneda(valor: number): string {
   }).format(valor);
 }
 
-function formatearFechaCompleta(fechaHizo: string): string {
-  return new Date(fechaHizo).toLocaleString('es-MX', {
+function formatearFechaCompleta(fechaIso: string): string {
+  return new Date(fechaIso).toLocaleString('es-MX', {
     dateStyle: 'medium',
     timeStyle: 'short',
   });
 }
 
-function formatearHora(fechaHizo: string): string {
-  return new Date(fechaHizo).toLocaleTimeString('es-MX', {
+function formatearHora(fechaIso: string): string {
+  return new Date(fechaIso).toLocaleTimeString('es-MX', {
     hour: '2-digit',
     minute: '2-digit',
   });

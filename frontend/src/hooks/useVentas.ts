@@ -35,7 +35,7 @@ function extraerError(err: unknown): string {
   return 'Error desconocido';
 }
 
-function hoyHizo(): string {
+function hoyIso(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
@@ -53,8 +53,8 @@ function finDelDiaIso(): string {
 
 const filtrosIniciales: FiltroVentas = {
   alcance: 'dia',
-  desde: hoyHizo(),
-  hasta: hoyHizo(),
+  desde: hoyIso(),
+  hasta: hoyIso(),
   vendedorId: 'todos',
 };
 

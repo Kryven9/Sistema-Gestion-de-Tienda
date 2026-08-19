@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LoginPage } from './pages/LoginPage';
 import { RegistroPage } from './pages/RegistroPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { FacturasPage } from './pages/FacturasPage';
 import { ProductosPage } from './pages/ProductosPage';
 import { UsuariosPage } from './pages/UsuariosPage';
 import { VentasPage } from './pages/VentasPage';
@@ -54,6 +55,16 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <VentasPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/facturas"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <FacturasPage />
                 </Layout>
               </ProtectedRoute>
             }

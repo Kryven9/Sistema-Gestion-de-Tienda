@@ -5,6 +5,7 @@ import {
   Menu,
   Package,
   PanelLeftClose,
+  ReceiptText,
   ShoppingBag,
   Store,
   Users,
@@ -17,6 +18,7 @@ const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/productos', label: 'Productos', icon: Package },
   { path: '/ventas', label: 'Ventas', icon: ShoppingBag },
+  { path: '/facturas', label: 'Facturas', icon: ReceiptText },
   { path: '/usuarios', label: 'Usuarios', icon: Users, soloDueno: true },
 ];
 
